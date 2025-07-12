@@ -779,7 +779,7 @@ class DownloadRequest(BaseModel):
     session_id: str
     format_id: str = None
 
-app = FastAPI(title="Instagram Downloader API - High Quality & Auto Cleanup")
+app = FastAPI(title="Instagram Downloader API - Enhanced Cloud Support")
 
 # Add CORS middleware
 app.add_middleware(
@@ -807,7 +807,7 @@ os.makedirs('output', exist_ok=True)
 video_cache = {}
 download_jobs: Dict[str, Dict[str, Any]] = {}
 job_lock = threading.Lock()
-executor = ThreadPoolExecutor(max_workers=8)  # Reduced for cloud deployment
+executor = ThreadPoolExecutor(max_workers=10)  # Reduced for cloud stability
 
 # Cleanup tracking
 temp_files = {}
@@ -820,11 +820,25 @@ class InstagramDownloader:
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15'
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
         ]
         
-        # ✅ CLOUD-OPTIMIZED EXTRACT OPTIONS
+        # ✅ ENHANCED HEADERS TO MIMIC REAL BROWSER
+        self.headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Cache-Control': 'max-age=0',
+        }
+        
         self.extract_opts = {
             'quiet': True,
             'no_warnings': True,
@@ -833,29 +847,25 @@ class InstagramDownloader:
             'writesubtitles': False,
             'writeautomaticsub': False,
             'socket_timeout': 45,  # Increased timeout
-            'retries': 5,  # More retries for cloud
+            'retries': 5,  # More retries
             'user_agent': random.choice(self.user_agents),
-            # ✅ ADDITIONAL HEADERS TO MIMIC REAL BROWSER
-            'http_headers': {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-                'Cache-Control': 'max-age=0',
-            },
-            # ✅ RATE LIMITING FOR CLOUD DEPLOYMENT
-            'sleep_interval': 2,  # Wait between requests
-            'max_sleep_interval': 5,
-            'sleep_interval_subtitles': 0,
+            # ✅ ENHANCED BYPASS OPTIONS
+            'http_headers': self.headers,
+            'sleep_interval': 1,  # Add delay between requests
+            'max_sleep_interval': 3,
+            'sleep_interval_subtitles': 1,
+            'ignoreerrors': False,
+            'no_check_certificate': True,
+            # ✅ INSTAGRAM SPECIFIC OPTIONS
+            'extractor_args': {
+                'instagram': {
+                    'api_version': 'v1',
+                    'include_stories': False
+                }
+            }
         }
         
-        # ✅ CLOUD-OPTIMIZED DOWNLOAD OPTIONS
+        # ✅ ENHANCED DOWNLOAD OPTIONS FOR CLOUD
         self.download_opts = {
             'quiet': True,
             'no_warnings': True,
@@ -863,37 +873,34 @@ class InstagramDownloader:
             'writesubtitles': False,
             'writeautomaticsub': False,
             'socket_timeout': 60,
-            'retries': 8,  # Even more retries for downloads
+            'retries': 8,  # Even more retries for download
             'user_agent': random.choice(self.user_agents),
-            # ✅ SAME ENHANCED HEADERS
-            'http_headers': {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-                'Cache-Control': 'max-age=0',
-                'Referer': 'https://www.instagram.com/',
-            },
-            # ✅ FORCE HIGHEST QUALITY FORMATS
+            'http_headers': self.headers,
+            'sleep_interval': 2,  # Longer delay for downloads
+            'max_sleep_interval': 5,
+            'no_check_certificate': True,
+            'prefer_insecure': False,
+            # ✅ QUALITY SETTINGS
             'format_sort': ['res:1080', 'fps', 'hdr:12', 'codec:h264', 'size', 'br', 'asr'],
             'format_sort_force': True,
-            # ✅ RATE LIMITING
-            'sleep_interval': 3,
-            'max_sleep_interval': 8,
-            # ✅ FRAGMENT RETRIES FOR BETTER RELIABILITY
-            'fragment_retries': 10,
-            'skip_unavailable_fragments': True,
+            # ✅ INSTAGRAM SPECIFIC BYPASS
+            'extractor_args': {
+                'instagram': {
+                    'api_version': 'v1',
+                    'include_stories': False,
+                    'comment_count': 0,
+                    'like_count': 0
+                }
+            }
         }
 
-    def get_random_delay(self):
-        """Random delay to avoid rate limiting"""
-        return random.uniform(1, 3)
+    def get_random_config(self, base_opts):
+        """Get randomized config to avoid detection"""
+        config = base_opts.copy()
+        config['user_agent'] = random.choice(self.user_agents)
+        config['socket_timeout'] = random.randint(30, 60)
+        config['sleep_interval'] = random.uniform(1, 3)
+        return config
 
     def is_valid_instagram_url(self, url):
         """Check if URL is valid Instagram URL"""
@@ -923,76 +930,94 @@ class InstagramDownloader:
         return 'unknown'
 
     def extract_info(self, url, content_type=None):
-        """Extract video information with cloud optimizations"""
-        try:
-            # ✅ Handle stories immediately
-            if content_type == 'story':
-                return {
-                    'success': False,
-                    'error': 'Instagram Stories are not supported',
-                    'error_type': 'story_not_supported',
-                    'message': 'Stories cannot be downloaded due to Instagram restrictions'
-                }
-            
-            # ✅ ADD RANDOM DELAY BEFORE EXTRACTION
-            time.sleep(self.get_random_delay())
-            
-            # ✅ RANDOMIZE USER AGENT FOR EACH REQUEST
-            extract_opts = self.extract_opts.copy()
-            extract_opts['user_agent'] = random.choice(self.user_agents)
-            
-            # Extract info for other content
-            with yt_dlp.YoutubeDL(extract_opts) as ydl:
-                info = ydl.extract_info(url, download=False)
+        """Extract video information with enhanced error handling"""
+        max_attempts = 3
+        
+        for attempt in range(max_attempts):
+            try:
+                # ✅ Handle stories immediately
+                if content_type == 'story':
+                    return {
+                        'success': False,
+                        'error': 'Instagram Stories are not supported',
+                        'error_type': 'story_not_supported',
+                        'message': 'Stories cannot be downloaded due to Instagram restrictions'
+                    }
                 
+                # ✅ ADD DELAY BETWEEN ATTEMPTS
+                if attempt > 0:
+                    time.sleep(random.uniform(2, 5))
+                
+                # Get randomized config for this attempt
+                extract_opts = self.get_random_config(self.extract_opts)
+                
+                with yt_dlp.YoutubeDL(extract_opts) as ydl:
+                    info = ydl.extract_info(url, download=False)
+                    
                 return {
                     'success': True,
                     'data': info,
                     'content_type': content_type
                 }
                 
-        except yt_dlp.DownloadError as e:
-            error_msg = str(e).lower()
-            
-            # ✅ ENHANCED ERROR DETECTION
-            if any(keyword in error_msg for keyword in ['login', 'cookies', 'authentication', 'sign in']):
+            except yt_dlp.DownloadError as e:
+                error_msg = str(e).lower()
+                
+                # ✅ ENHANCED ERROR DETECTION
+                if any(keyword in error_msg for keyword in ['login', 'cookies', 'authentication', 'sign in']):
+                    if attempt < max_attempts - 1:
+                        continue  # Retry with different config
+                    return {
+                        'success': False,
+                        'error': 'This content requires authentication or is rate-limited',
+                        'error_type': 'authentication_required',
+                        'suggestion': 'Try again in a few minutes or use a different post'
+                    }
+                elif any(keyword in error_msg for keyword in ['private', 'unavailable', 'not found']):
+                    return {
+                        'success': False,
+                        'error': 'Content is private or unavailable',
+                        'error_type': 'content_unavailable'
+                    }
+                elif 'rate' in error_msg:
+                    if attempt < max_attempts - 1:
+                        time.sleep(random.uniform(5, 10))  # Longer wait for rate limit
+                        continue
+                    return {
+                        'success': False,
+                        'error': 'Rate limit reached. Please try again later.',
+                        'error_type': 'rate_limit'
+                    }
+                else:
+                    if attempt < max_attempts - 1:
+                        continue
+                    return {
+                        'success': False,
+                        'error': f'Extraction failed: {str(e)}',
+                        'error_type': 'extraction_error'
+                    }
+                    
+            except Exception as e:
+                if attempt < max_attempts - 1:
+                    time.sleep(random.uniform(1, 3))
+                    continue
                 return {
                     'success': False,
-                    'error': 'This content requires authentication or may be private',
-                    'error_type': 'authentication_required',
-                    'suggestion': 'Try a different public Instagram post or reel'
+                    'error': f'Unexpected error: {str(e)}',
+                    'error_type': 'unexpected_error'
                 }
-            elif any(keyword in error_msg for keyword in ['rate limit', 'too many requests', 'blocked']):
-                return {
-                    'success': False,
-                    'error': 'Rate limited by Instagram. Please try again in a few minutes.',
-                    'error_type': 'rate_limited',
-                    'suggestion': 'Wait 2-3 minutes before trying again'
-                }
-            elif 'private' in error_msg or 'unavailable' in error_msg:
-                return {
-                    'success': False,
-                    'error': 'This content is private or unavailable',
-                    'error_type': 'private_content'
-                }
-            else:
-                return {
-                    'success': False,
-                    'error': f'Instagram access error. This may be due to content restrictions or temporary blocks.',
-                    'error_type': 'extraction_error',
-                    'suggestion': 'Try a different Instagram URL or wait a few minutes'
-                }
-        except Exception as e:
-            return {
-                'success': False,
-                'error': f'Network or server error: {str(e)}',
-                'error_type': 'network_error',
-                'suggestion': 'Check your internet connection and try again'
-            }
+        
+        return {
+            'success': False,
+            'error': 'All extraction attempts failed',
+            'error_type': 'max_attempts_exceeded'
+        }
 
     def download_video_to_temp(self, url, format_id, job_id, content_type=None):
-        """Download video to temporary location with cloud optimizations"""
+        """Download video with enhanced cloud compatibility"""
         temp_dir = None
+        max_attempts = 3
+        
         try:
             if content_type == 'story':
                 with job_lock:
@@ -1002,124 +1027,140 @@ class InstagramDownloader:
                             'error': 'Stories cannot be downloaded'
                         })
                 return None
-                
+            
             with job_lock:
                 if job_id in download_jobs:
                     download_jobs[job_id]['status'] = 'downloading'
                     download_jobs[job_id]['progress'] = 5
-
-            # ✅ ADD RANDOM DELAY BEFORE DOWNLOAD
-            time.sleep(self.get_random_delay())
             
             # ✅ CREATE TEMPORARY DIRECTORY
             temp_dir = tempfile.mkdtemp(prefix='instagram_dl_')
             unique_id = str(uuid.uuid4())[:8]
             
-            # ✅ RANDOMIZE DOWNLOAD OPTIONS
-            download_opts = self.download_opts.copy()
-            download_opts['user_agent'] = random.choice(self.user_agents)
-            
-            if format_id == 'audio_only':
-                download_opts.update({
-                    'format': 'bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio/best',
-                    'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s'),
-                    'postprocessors': [{
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        'preferredquality': '320',
-                    }],
-                    'prefer_ffmpeg': True,
-                })
-            elif format_id and format_id != 'best':
-                download_opts.update({
-                    'format': format_id,
-                    'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s')
-                })
-            else:
-                # ✅ CLOUD-OPTIMIZED FORMAT SELECTION
-                download_opts.update({
-                    'format': (
-                        'best[height<=1080][acodec!=none]/best[height<=720][acodec!=none]/'
-                        'best[height<=480][acodec!=none]/best[acodec!=none]/'
-                        'bestvideo[height<=1080]+bestaudio/bestvideo[height<=720]+bestaudio/'
-                        'bestvideo+bestaudio/best'
-                    ),
-                    'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s'),
-                    'merge_output_format': 'mp4',
-                })
-                
-            def progress_hook(d):
+            for attempt in range(max_attempts):
                 try:
-                    if d['status'] == 'downloading':
-                        progress = 50
-                        if '_percent_str' in d:
-                            percent_str = d['_percent_str'].replace('%', '').strip()
-                            try:
-                                progress = float(percent_str)
-                            except:
+                    # ✅ ADD DELAY BETWEEN DOWNLOAD ATTEMPTS
+                    if attempt > 0:
+                        time.sleep(random.uniform(3, 8))
+                    
+                    download_opts = self.get_random_config(self.download_opts)
+                    
+                    if format_id == 'audio_only':
+                        download_opts.update({
+                            'format': 'bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio/best',
+                            'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s'),
+                            'postprocessors': [{
+                                'key': 'FFmpegExtractAudio',
+                                'preferredcodec': 'mp3',
+                                'preferredquality': '320',
+                            }],
+                            'prefer_ffmpeg': True,
+                        })
+                    elif format_id and format_id != 'best':
+                        download_opts.update({
+                            'format': format_id,
+                            'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s')
+                        })
+                    else:
+                        # ✅ ENHANCED FORMAT SELECTION FOR CLOUD
+                        download_opts.update({
+                            'format': (
+                                'best[height<=1080][acodec!=none]/best[height<=720][acodec!=none]/'
+                                'best[height<=480][acodec!=none]/best[acodec!=none]/'
+                                'bestvideo[height<=1080]+bestaudio/bestvideo[height<=720]+bestaudio/'
+                                'bestvideo+bestaudio/best'
+                            ),
+                            'outtmpl': os.path.join(temp_dir, f'{unique_id}_%(title)s.%(ext)s'),
+                            'merge_output_format': 'mp4',
+                        })
+                    
+                    def progress_hook(d):
+                        try:
+                            if d['status'] == 'downloading':
                                 progress = 50
+                                if '_percent_str' in d:
+                                    percent_str = d['_percent_str'].replace('%', '').strip()
+                                    try:
+                                        progress = float(percent_str)
+                                    except:
+                                        progress = 50
                                 
-                        with job_lock:
-                            if job_id in download_jobs:
-                                download_jobs[job_id]['progress'] = min(progress, 95)
-                                
-                    elif d['status'] == 'finished':
-                        with job_lock:
-                            if job_id in download_jobs:
-                                download_jobs[job_id]['progress'] = 95
-                                download_jobs[job_id]['status'] = 'processing'
-                except Exception:
-                    pass
-                
-            download_opts['progress_hooks'] = [progress_hook]
-                
-            with yt_dlp.YoutubeDL(download_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-            
-            # Find the downloaded file
-            downloaded_files = glob.glob(os.path.join(temp_dir, f'{unique_id}_*'))
-            if not downloaded_files:
-                raise Exception("No files were downloaded")
-            
-            file_path = downloaded_files[0]
-            
-            if not os.path.exists(file_path):
-                raise Exception("Downloaded file not found")
-                
-            file_size = os.path.getsize(file_path)
-            title = info.get('title', 'Instagram Content')
-            ext = 'mp3' if format_id == 'audio_only' else info.get('ext', 'mp4')
-            
-            # ✅ REGISTER FOR AUTO-CLEANUP
-            cleanup_time = datetime.now() + timedelta(minutes=10)  # Extended cleanup time for cloud
-            with temp_files_lock:
-                temp_files[job_id] = {
-                    'file_path': file_path,
-                    'temp_dir': temp_dir,
-                    'cleanup_time': cleanup_time,
-                    'filename': os.path.basename(file_path)
-                }
-                
-            with job_lock:
-                if job_id in download_jobs:
-                    download_jobs[job_id].update({
-                        'status': 'completed',
-                        'progress': 100,
-                        'file_path': file_path,
-                        'filename': os.path.basename(file_path),
-                        'file_size': file_size,
-                        'temp_dir': temp_dir,
-                        'info': {
-                            'title': title,
-                            'duration': info.get('duration'),
-                            'uploader': info.get('uploader'),
-                            'quality': info.get('height', 'Unknown'),
-                            'format': info.get('format', 'Unknown')
+                                with job_lock:
+                                    if job_id in download_jobs:
+                                        download_jobs[job_id]['progress'] = min(progress, 95)
+                            
+                            elif d['status'] == 'finished':
+                                with job_lock:
+                                    if job_id in download_jobs:
+                                        download_jobs[job_id]['progress'] = 95
+                                        download_jobs[job_id]['status'] = 'processing'
+                        except Exception:
+                            pass
+                    
+                    download_opts['progress_hooks'] = [progress_hook]
+                    
+                    with yt_dlp.YoutubeDL(download_opts) as ydl:
+                        info = ydl.extract_info(url, download=True)
+                    
+                    # Find the downloaded file
+                    downloaded_files = glob.glob(os.path.join(temp_dir, f'{unique_id}_*'))
+                    if not downloaded_files:
+                        if attempt < max_attempts - 1:
+                            continue
+                        raise Exception("No files were downloaded")
+                    
+                    file_path = downloaded_files[0]
+                    
+                    if not os.path.exists(file_path):
+                        if attempt < max_attempts - 1:
+                            continue
+                        raise Exception("Downloaded file not found")
+                    
+                    file_size = os.path.getsize(file_path)
+                    title = info.get('title', 'Instagram Content')
+                    ext = 'mp3' if format_id == 'audio_only' else info.get('ext', 'mp4')
+                    
+                    # ✅ REGISTER FOR AUTO-CLEANUP
+                    cleanup_time = datetime.now() + timedelta(minutes=5)
+                    with temp_files_lock:
+                        temp_files[job_id] = {
+                            'file_path': file_path,
+                            'temp_dir': temp_dir,
+                            'cleanup_time': cleanup_time,
+                            'filename': os.path.basename(file_path)
                         }
-                    })
-                
-            return file_path
-                
+                    
+                    with job_lock:
+                        if job_id in download_jobs:
+                            download_jobs[job_id].update({
+                                'status': 'completed',
+                                'progress': 100,
+                                'file_path': file_path,
+                                'filename': os.path.basename(file_path),
+                                'file_size': file_size,
+                                'temp_dir': temp_dir,
+                                'info': {
+                                    'title': title,
+                                    'duration': info.get('duration'),
+                                    'uploader': info.get('uploader'),
+                                    'quality': info.get('height', 'Unknown'),
+                                    'format': info.get('format', 'Unknown')
+                                }
+                            })
+                    
+                    return file_path
+                    
+                except yt_dlp.DownloadError as e:
+                    error_msg = str(e).lower()
+                    if 'rate' in error_msg or 'login' in error_msg:
+                        if attempt < max_attempts - 1:
+                            continue  # Retry with longer delay
+                    raise e
+                except Exception as e:
+                    if attempt < max_attempts - 1:
+                        continue
+                    raise e
+                    
         except Exception as e:
             # ✅ CLEANUP ON ERROR
             if temp_dir and os.path.exists(temp_dir):
@@ -1127,20 +1168,12 @@ class InstagramDownloader:
                     shutil.rmtree(temp_dir)
                 except:
                     pass
-                
-            error_msg = str(e).lower()
-            if any(keyword in error_msg for keyword in ['rate limit', 'blocked', 'too many']):
-                error_message = 'Rate limited by Instagram. Please try again in a few minutes.'
-            elif any(keyword in error_msg for keyword in ['login', 'authentication', 'cookies']):
-                error_message = 'This content requires authentication or may be private.'
-            else:
-                error_message = f'Download failed: {str(e)}'
-                
+            
             with job_lock:
                 if job_id in download_jobs:
                     download_jobs[job_id].update({
                         'status': 'failed',
-                        'error': error_message
+                        'error': f'Download failed: {str(e)}'
                     })
             return None
 
@@ -1156,7 +1189,7 @@ async def cleanup_temp_files():
                 for job_id, file_info in temp_files.items():
                     if current_time > file_info['cleanup_time']:
                         files_to_cleanup.append(job_id)
-                
+            
             for job_id in files_to_cleanup:
                 with temp_files_lock:
                     if job_id in temp_files:
@@ -1168,11 +1201,11 @@ async def cleanup_temp_files():
                             print(f"Cleanup error for {job_id}: {e}")
                         finally:
                             del temp_files[job_id]
-                
-            await asyncio.sleep(120)  # Check every 2 minutes for cloud efficiency
+            
+            await asyncio.sleep(60)  # Check every minute
         except Exception as e:
             print(f"Cleanup task error: {e}")
-            await asyncio.sleep(120)
+            await asyncio.sleep(60)
 
 # Async wrappers
 async def extract_info_async(url, content_type=None):
@@ -1196,7 +1229,7 @@ async def index(request: Request):
 
 @app.post("/extract")
 async def extract_video_info(request_data: URLRequest):
-    """Extract video information - Cloud Optimized"""
+    """Extract video information - Enhanced Cloud Support"""
     try:
         url = request_data.url.strip()
         content_type = request_data.content_type
@@ -1267,18 +1300,18 @@ async def extract_video_info(request_data: URLRequest):
         
         info = result['data']
         
-        # ✅ ENHANCED FORMAT PROCESSING FOR CLOUD DEPLOYMENT
+        # ✅ ENHANCED FORMAT PROCESSING FOR HIGHEST QUALITY
         formats = []
         if 'formats' in info and info['formats']:
             # Filter and sort for highest quality video formats
             video_formats = []
             
             for fmt in info['formats']:
-                if (fmt.get('vcodec') != 'none' and 
-                     fmt.get('acodec') != 'none' and 
+                if (fmt.get('vcodec') != 'none' and
+                     fmt.get('acodec') != 'none' and
                      fmt.get('height') and fmt.get('width')):
                     
-                    # ✅ SAFE QUALITY SCORE CALCULATION
+                    # ✅ SAFE QUALITY SCORE CALCULATION WITH NONE CHECKS
                     height = fmt.get('height') or 0
                     width = fmt.get('width') or 0
                     tbr = fmt.get('tbr') or 0
@@ -1310,13 +1343,13 @@ async def extract_video_info(request_data: URLRequest):
                 if height and height not in seen_heights and len(formats) < 4:
                     seen_heights.add(height)
                     
-                    # ✅ CLOUD-FRIENDLY QUALITY LABELS
+                    # ✅ ENHANCED QUALITY LABELS
                     if height >= 1080:
-                        quality_label = f"Full HD ({height}p) - Best Quality"
+                        quality_label = f"Ultra HD ({height}p) - Best Quality"
                     elif height >= 720:
-                        quality_label = f"HD ({height}p) - High Quality"
+                        quality_label = f"Full HD ({height}p) - High Quality"
                     elif height >= 480:
-                        quality_label = f"SD ({height}p) - Good Quality"
+                        quality_label = f"HD ({height}p) - Good Quality"
                     else:
                         quality_label = f"Standard ({height}p)"
                     
@@ -1336,7 +1369,7 @@ async def extract_video_info(request_data: URLRequest):
             formats.append({
                 'format_id': 'best',
                 'ext': 'mp4',
-                'quality': 'Best Available Quality (Auto)',
+                'quality': 'Highest Available Quality (Auto)',
                 'type': 'video'
             })
         
@@ -1371,7 +1404,7 @@ async def extract_video_info(request_data: URLRequest):
                 'session_id': session_id,
                 'video_info': video_cache[session_id]['info'],
                 'content_type': content_type,
-                'quality_note': 'Optimized for cloud deployment with rate limiting protection'
+                'quality_note': 'All downloads are optimized for highest available quality'
             }
         )
         
@@ -1381,14 +1414,13 @@ async def extract_video_info(request_data: URLRequest):
             content={
                 'success': False,
                 'error': f'Server error: {str(e)}',
-                'error_type': 'server_error',
-                'suggestion': 'Please try again in a few moments'
+                'error_type': 'server_error'
             }
         )
 
 @app.post("/download")
 async def download_video_endpoint(request_data: DownloadRequest, background_tasks: BackgroundTasks):
-    """Start download process - Cloud Optimized"""
+    """Start download process"""
     try:
         session_id = request_data.session_id
         format_id = request_data.format_id
@@ -1441,8 +1473,7 @@ async def download_video_endpoint(request_data: DownloadRequest, background_task
             content={
                 'success': True,
                 'job_id': job_id,
-                'message': f'Cloud-optimized download started for Instagram {content_type}',
-                'note': 'Download may take longer on cloud deployment due to rate limiting protection'
+                'message': f'Enhanced cloud download started for Instagram {content_type}'
             }
         )
         
@@ -1540,7 +1571,7 @@ async def download_file(job_id: str):
 
 @app.get("/health")
 async def health_check():
-    """Health check with cloud deployment info"""
+    """Health check with enhanced cloud info"""
     with temp_files_lock:
         temp_files_count = len(temp_files)
     
@@ -1548,11 +1579,13 @@ async def health_check():
         status_code=200,
         content={
             'status': 'OK',
-            'message': 'Instagram Downloader API - Cloud Optimized',
+            'message': 'Instagram Downloader API - Enhanced Cloud Support',
             'features': [
-                'Cloud-optimized with rate limiting protection',
-                'Enhanced user agent rotation',
-                'Automatic file cleanup (10 min)',
+                'Enhanced cloud deployment compatibility',
+                'Multiple user agents rotation',
+                'Advanced retry mechanisms',
+                'Rate limit handling',
+                'Automatic file cleanup (5 min)',
                 'No permanent storage',
                 'Streaming downloads'
             ],
@@ -1560,11 +1593,16 @@ async def health_check():
             'not_supported': ['stories'],
             'active_downloads': len(download_jobs),
             'temp_files': temp_files_count,
-            'deployment': 'Cloud optimized for Railway/Heroku/etc',
-            'anti_detection': 'Enhanced headers and rate limiting'
+            'cloud_optimizations': [
+                'Randomized headers and user agents',
+                'Progressive retry with backoff',
+                'Enhanced error handling',
+                'Rate limit detection and handling'
+            ]
         }
     )
 
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+
