@@ -1,0 +1,160 @@
+/* ========== THEME VARIABLES ========== */
+:root {
+  /* FONT FAMILY */
+  --font-family-base: "Inter", sans-serif;
+  --font-quick: "Quicksand", sans-serif;
+
+  /* FONT SIZES */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-md: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 36px;
+  --font-size-4xl: 42px;
+
+  /* FONT WEIGHTS */
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* SPACING */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 40px;
+  --spacing-3xl: 60px;
+
+  /* COLORS - LIGHT THEME */
+  --color-primary: #0066ff;
+  --color-primary-light: #e6f0ff;
+  --color-primary-glow: #d2e3ff;
+
+  --color-text-dark: #1a1a1a;
+  --color-text-light: #666666;
+  --color-text-muted: #999999;
+  --color-white: #ffffff;
+  --color-light-gray: #f9f9f9;
+  --color-border: #e0e0e0;
+
+  --color-danger: #ff0000;
+  --color-success: #00c48c;
+  --color-warning-bg: #141414;
+
+  --bg-light: #f9f9f9;
+  --bg-dark: #141414;
+
+  /* LAYOUT */
+  --max-width: 1164px;
+  --content-side-padding: 24px;
+
+  /* RADIUS */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* SHADOW */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  /* TRANSITION */
+  --transition-fast: 0.2s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+
+  /* Theme Switch */
+  --background: var(--bg-light);
+  --foreground: var(--color-text-dark);
+  --accent: var(--color-primary);
+  --secondary: var(--color-text-light);
+  --border: var(--color-border);
+    --shadow-main: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ========== DARK THEME OVERRIDES ========== */
+[data-theme="dark"] {
+  --background: #141414;
+  --foreground: #ffffff;
+  --accent: #3399ff;
+  --secondary: #cccccc;
+  --border: #333333;
+    --shadow-main: 0 6px 20px rgba(245, 245, 245, 0.12);
+}
+
+/* ========== RESET & BASE ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html{
+  overflow-x: hidden;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+li {
+  list-style: none;
+}
+
+/* ========== CONTAINERS ========== */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-side-padding);
+}
+
+.container-lg {
+  width: 100%;
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 0 var(--content-side-padding);
+}
+
+/* ========== BUTTON (FOR THEME TOGGLE) ========== */
+.toggle-btn {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-top: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #004ecc;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes bonce {
+  0% {
+    transform: translateY(0);
+    transition: all 0.1s ease-in-out;
+  }
+  50% {
+    transform: translateY(25%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

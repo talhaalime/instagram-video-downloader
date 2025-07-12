@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram Video Downloader</title>
+
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        } else {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      })();
+    </script>
+
+    <link rel="stylesheet" href="/static/main.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Quicksand:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container-lg">
+        <div class="header__container">
+          <div class="header__logo">
+            <a href="/">
+              <h1>loader.<span>fo</span></h1>
+            </a>
+          </div>
+          <div class="header__links header__hidden">
+            <div class="header__head">
+              <div class="header__logo-main">
+                <a href="/">
+                  <h1>loader.<span>fo</span></h1>
+                </a>
+              </div>
+              <div class="header__close">
+                <i class="fa-solid fa-xmark"></i>
+              </div>
+            </div>
+
+            <ul>
+              <li><a href="#">Link 1</a></li>
+              <li><a href="#">Link 2</a></li>
+              <li><a href="#">Link 3</a></li>
+            </ul>
+          </div>
+          <div class="header__menu">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Header -->
+      <section class="section--hero">
+        <div class="hero">
+          <div class="hero__icons">
+            <div class="hero__icon hero__star">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="hero__icon hero__music">
+              <i class="fa-solid fa-music"></i>
+            </div>
+            <div class="hero__icon hero__video">
+              <i class="fa-solid fa-video"></i>
+            </div>
+            <div class="hero__icon hero__insta">
+              <i class="fa-brands fa-instagram"></i>
+            </div>
+          </div>
+          <div class="hero__container">
+            <div class="hero__title">
+              <h1>instaGram video downloader</h1>
+              <div class="hero__img">
+                <img src="/images/wave.png" alt="" />
+              </div>
+            </div>
+            <div class="hero__subtitle">
+              <h2>
+                try this unique tool for quick, hassle-free downloads from
+                Instagram. Transform your offline video collection with this
+                reliable and efficient downloader.
+              </h2>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- URL Input Section -->
+        <section class="input-section">
+          <div class="input-container">
+            <input
+              type="url"
+              id="videoUrl"
+              placeholder="Paste Instagram Video URL here"
+              class="url-input"
+              required
+            />
+            <button id="extractBtn" class="extract-btn">
+              <i class="fas fa-search"></i>
+              <span>Extract Info</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Loading Section -->
+        <section id="loadingSection" class="loading-section hidden">
+          <div class="loading-container">
+            <!-- Modern Circular Progress -->
+            <div class="circular-progress">
+              <svg viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient
+                    id="gradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop
+                      offset="0%"
+                      style="stop-color: #833ab4; stop-opacity: 1"
+                    />
+                    <stop
+                      offset="100%"
+                      style="stop-color: #fd1d1d; stop-opacity: 1"
+                    />
+                  </linearGradient>
+                  <linearGradient
+                    id="downloadGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop
+                      offset="0%"
+                      style="stop-color: #28a745; stop-opacity: 1"
+                    />
+                    <stop
+                      offset="100%"
+                      style="stop-color: #20c997; stop-opacity: 1"
+                    />
+                  </linearGradient>
+                </defs>
+                <circle class="progress-ring" cx="60" cy="60" r="50"></circle>
+                <circle
+                  class="progress-ring-fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  id="progressCircle"
+                ></circle>
+              </svg>
+              <div class="progress-percentage-center" id="circularProgress">
+                0%
+              </div>
+            </div>
+
+            <!-- Loading Text -->
+            <div class="loading-text">
+              <span id="loadingText">Extracting video information</span>
+              <span class="loading-dots"></span>
+            </div>
+
+            <div class="loading-details" id="loadingDetails">
+              Please wait while we process your Instagram video...
+            </div>
+
+            <!-- Secondary Progress Bar -->
+            <div class="progress-bar-container">
+              <div class="progress-bar-label">
+                <span id="progressLabel">Processing...</span>
+                <span id="progressPercentage">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Video Info Section -->
+        <section id="videoInfoSection" class="video-info-section hidden">
+          <div class="video-card">
+            <div class="video-thumbnail" id="videoThumbnailContainer">
+              <img
+                id="videoThumbnail"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-size='14' text-anchor='middle' dy='.3em' fill='%23999'%3ENo Thumbnail%3C/text%3E%3C/svg%3E"
+                alt="Video Thumbnail"
+              />
+              <div class="play-overlay">
+                <i class="fab fa-instagram"></i>
+              </div>
+            </div>
+            <div class="video-details">
+              <h3 id="videoTitle">Instagram Video</h3>
+              <div class="video-meta">
+                <span id="videoUploader"
+                  ><i class="fas fa-user"></i> Unknown</span
+                >
+                <span id="videoDuration"
+                  ><i class="fas fa-clock"></i> 0:00</span
+                >
+                <span id="videoViews"><i class="fas fa-eye"></i> 0 views</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Format Selection -->
+          <div class="format-section">
+            <h4>Choose Quality & Format:</h4>
+            <div id="formatList" class="format-list">
+              <!-- Formats will be populated here -->
+            </div>
+          </div>
+
+          <!-- Download Button -->
+          <button id="downloadBtn" class="download-btn disabled">
+            <i class="fas fa-download"></i>
+            <span>Select a format to download</span>
+          </button>
+        </section>
+
+        <!-- Download Progress Section -->
+        <section id="downloadSection" class="download-section hidden">
+          <div class="loading-container">
+            <!-- Job Status Badge -->
+            <div class="job-status" id="jobStatus">
+              <i class="fas fa-clock"></i>
+              <span>Queued</span>
+            </div>
+
+            <!-- Modern Circular Progress for Download -->
+            <div class="circular-progress">
+              <svg viewBox="0 0 120 120">
+                <circle class="progress-ring" cx="60" cy="60" r="50"></circle>
+                <circle
+                  class="progress-ring-fill"
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  id="downloadProgressCircle"
+                ></circle>
+              </svg>
+              <div
+                class="progress-percentage-center"
+                id="downloadCircularProgress"
+              >
+                0%
+              </div>
+            </div>
+
+            <!-- Download Text -->
+            <div class="loading-text">
+              <span id="downloadText">Starting download</span>
+              <span class="loading-dots"></span>
+            </div>
+
+            <div class="loading-details" id="downloadDetails">
+              Your Instagram video download has been queued...
+            </div>
+
+            <!-- Download Progress Bar -->
+            <div class="progress-bar-container">
+              <div class="progress-bar-label">
+                <span id="downloadProgressLabel">Queued...</span>
+                <span id="downloadProgressPercentage">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="downloadProgressFill"></div>
+              </div>
+            </div>
+
+            <!-- Job Info -->
+            <div class="download-details" style="margin-top: 15px">
+              <span id="jobId">Job ID: Loading...</span>
+              <span id="videoTitle2">Video: Loading...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Download Complete Section -->
+        <section
+          id="downloadCompleteSection"
+          class="download-complete-section hidden"
+        >
+          <div class="success-card">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Download Complete!</h3>
+            <p>Your Instagram video has been successfully downloaded.</p>
+            <div class="download-actions">
+              <a id="downloadLink" href="#" class="download-link-btn">
+                <i class="fas fa-download"></i>
+                <span>Download File</span>
+              </a>
+              <button id="downloadAnotherBtn" class="secondary-btn">
+                <i class="fas fa-plus"></i>
+                <span>Download Another</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Error Section -->
+        <section id="errorSection" class="error-section hidden">
+          <div class="error-card">
+            <div class="error-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Error Occurred</h3>
+            <p id="errorMessage">Something went wrong. Please try again.</p>
+            <button id="retryBtn" class="retry-btn">
+              <i class="fas fa-redo"></i>
+              <span>Try Again</span>
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <section class="section--note">
+      <div class="container-lg">
+        <div class="note">
+          <div class="container">
+            <p>we do not allow/support the download of copyright material !</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--about">
+      <div class="about">
+        <div class="container">
+          <div class="about__content">
+            <div class="about__title">
+              <h1>what is loader.fo</h1>
+              <div class="about__img">
+                <img src="/images/wave.png" alt="" />
+              </div>
+            </div>
+            <div class="about__text">
+              <p>
+                loader.fo is one of the most popular downloader tools on the
+                internet. With this tool, you can download and convert videos
+                from almost anywhere on the internet, from YouTube, Twitter, and
+                Facebook to OK.ru, TikTok, and everything in between.
+                Functionality-wise, it’s very straightforward. The user is
+                required to enter the page URL in the "URL" field, choose the
+                format, and click download.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="container-lg">
+          <div class="about__container">
+            <div class="about__col">
+              <div class="about__heading">
+                <h3>
+                  Experience Buffer-Free Entertainment With YouTube Video
+                  Downloader
+                </h3>
+              </div>
+              <div class="about__col-text">
+                <p>
+                  The YouTube Video Downloader promises uninterrupted
+                  entertainment and a buffer-free experience for your favorite
+                  YouTube content. This user-friendly tool helps you to download
+                  videos effortlessly, eliminating the frustration of buffering.
+                </p>
+              </div>
+            </div>
+            <div class="about__col about__col-2">
+              <div class="about__heading">
+                <h3>Your One-Stop Solution to YouTube Video Downloading</h3>
+              </div>
+              <div class="about__col-text">
+                <p>
+                  Tired of those annoying buffering pauses ruining your YouTube
+                  binge? Well, say hello to uninterrupted entertainment with
+                  loader.fo! This nifty tool not only lets you download your
+                  favorite YouTube videos for free but also helps bid goodbye to
+                  those dreaded buffering intervals. Imagine a world where your
+                  videos load instantly, without any interruptions. That’s the
+                  magic of loader.fo. like having a premium pass to buffer-free
+                  streaming – just the way entertainment should be. And the best
+                  part? It won’t cost you a dime.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--faq">
+      <div class="faq">
+        <div class="container-lg">
+          <div class="heading--primary">
+            <span>faq</span>
+            <h1>frequently asked questions</h1>
+            <div class="primary__img">
+              <img src="/images/wave.png" alt="border bottom wave" />
+            </div>
+          </div>
+
+          <div class="faq__container">
+            <div class="faq__col">
+              <div class="faq__col-title">
+                <h3>instagram downloader : FAQs</h3>
+              </div>
+
+              <div class="accordion">
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Are there any subscription plans, or is it a one-time
+                    purchase?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Can the downloader be used without providing personal
+                    information?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Can the downloader be used without providing personal
+                    information?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="faq__col">
+              <div class="faq__col-title">
+                <h3>loader.fo : FAQs</h3>
+              </div>
+              <div class="accordion">
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Are there any subscription plans, or is it a one-time
+                    purchase?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Can the downloader be used without providing personal
+                    information?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    Can the downloader be used without providing personal
+                    information?
+                    <div class="accordion-arrow">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <div class="accordion-inner">
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Neque nisi dolore iure, eligendi ab magnam, omnis,
+                      obcaecati reiciendis voluptate beatae explicabo suscipit
+                      veritatis iste temporibus doloribus voluptatum sint
+                      commodi molestiae.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--feature">
+      <div class="feature">
+        <div class="container-lg">
+          <div class="heading--primary">
+            <span>features</span>
+            <h1>what makes us special</h1>
+            <div class="primary__img">
+              <img src="/images/wave.png" alt="border bottom wave" />
+            </div>
+          </div>
+          <div class="feature__container">
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-1.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>no download limits</h2>
+              </div>
+              <div class="feature__text">
+                <p>you can download all content you want without any limits.</p>
+              </div>
+            </div>
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-2.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>downloads at no cost</h2>
+              </div>
+              <div class="feature__text">
+                <p>
+                  you cna convert video and adio content and download it for
+                  free here.
+                </p>
+              </div>
+            </div>
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-3.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>the best speeds</h2>
+              </div>
+              <div class="feature__text">
+                <p>
+                  our platform converts videos and audios quickly and
+                  efficiently in seconds.
+                </p>
+              </div>
+            </div>
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-4.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>easy to use</h2>
+              </div>
+              <div class="feature__text">
+                <p>
+                  you can convert and download content using our tool with a few
+                  clicks.
+                </p>
+              </div>
+            </div>
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-5.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>no needs for apps</h2>
+              </div>
+              <div class="feature__text">
+                <p>
+                  since our tool is online , you can use it without installing
+                  any apps.
+                </p>
+              </div>
+            </div>
+            <div class="feature__card">
+              <div class="feature__icon">
+                <img
+                  src="/images/feature-6.png"
+                  alt="this img about feature icons"
+                />
+              </div>
+              <div class="fearture__title">
+                <h2>well secured</h2>
+              </div>
+              <div class="feature__text">
+                <p>
+                  our website is very well secured . we have developed advanced
+                  encryption and security measures to protect your data.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__container">
+          <div class="footer__logo">
+            <a href="/">
+              <h1>loader.<span>fo</span></h1>
+            </a>
+          </div>
+          <div class="footer__copy">
+            <p>copyright &copy; 2025 loader.fo all right reserverd</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- <script src="/static/script.js"></script> -->
+
+    <script>
+      // Global variables
+      let currentSessionId = null;
+      let selectedFormat = null;
+      let currentJobId = null;
+      let statusCheckInterval = null;
+
+      // DOM elements
+      const videoUrlInput = document.getElementById("videoUrl");
+      const extractBtn = document.getElementById("extractBtn");
+      const loadingSection = document.getElementById("loadingSection");
+      const videoInfoSection = document.getElementById("videoInfoSection");
+      const downloadSection = document.getElementById("downloadSection");
+      const downloadCompleteSection = document.getElementById(
+        "downloadCompleteSection"
+      );
+      const errorSection = document.getElementById("errorSection");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const formatList = document.getElementById("formatList");
+      const downloadLink = document.getElementById("downloadLink");
+      const downloadAnotherBtn = document.getElementById("downloadAnotherBtn");
+      const retryBtn = document.getElementById("retryBtn");
+      const errorMessage = document.getElementById("errorMessage");
+
+      // Job status elements
+      const jobStatus = document.getElementById("jobStatus");
+      const jobIdElement = document.getElementById("jobId");
+      const videoTitle2 = document.getElementById("videoTitle2");
+
+      // ✅ URL Processing Functions
+      function normalizeInstagramURL(url) {
+        try {
+          url = url.trim().replace(/\/$/, "");
+          const patterns = [
+            /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/i,
+            /(?:https?:\/\/)?(?:www\.)?instagram\.com\/stories\/([A-Za-z0-9_.]+)\/([0-9]+)/i,
+          ];
+
+          for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+              if (pattern.source.includes("stories")) {
+                return {
+                  url: `https://www.instagram.com/stories/${match[1]}/${match[2]}/`,
+                  type: "story",
+                  id: match[2],
+                  username: match[1],
+                };
+              } else {
+                const postId = match[1];
+                return {
+                  url: `https://www.instagram.com/reel/${postId}/?utm_source=ig_web_copy_link`,
+                  type: "reel",
+                  id: postId,
+                };
+              }
+            }
+          }
+          return null;
+        } catch (error) {
+          console.error("URL normalization error:", error);
+          return null;
+        }
+      }
+
+      function detectInstagramContentType(url) {
+        if (url.includes("/stories/")) {
+          return "story";
+        } else if (url.includes("/reels/") || url.includes("/reel/")) {
+          return "reel";
+        } else if (url.includes("/p/")) {
+          return "post";
+        } else if (url.includes("/tv/")) {
+          return "igtv";
+        }
+        return "unknown";
+      }
+
+      function validateInstagramURL(url) {
+        const normalizedData = normalizeInstagramURL(url);
+        if (!normalizedData) {
+          return {
+            valid: false,
+            error: "Invalid Instagram URL format",
+          };
+        }
+        return {
+          valid: true,
+          data: normalizedData,
+        };
+      }
+
+      // Event listeners
+      extractBtn.addEventListener("click", extractVideoInfo);
+      downloadBtn.addEventListener("click", downloadVideo);
+      downloadAnotherBtn.addEventListener("click", resetForm);
+      retryBtn.addEventListener("click", resetForm);
+
+      videoUrlInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") extractVideoInfo();
+      });
+
+      // Show section function
+      function showSection(section) {
+        const sections = [
+          loadingSection,
+          videoInfoSection,
+          downloadSection,
+          downloadCompleteSection,
+          errorSection,
+        ];
+        sections.forEach((s) => s.classList.add("hidden"));
+        section.classList.remove("hidden");
+      }
+
+      // ✅ ENHANCED ERROR DISPLAY
+      function showError(message, isStoryError = false, errorData = null) {
+        if (isStoryError && errorData) {
+          errorMessage.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #e74c3c; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                         Instagram Stories Not Supported
+                    </h3>
+                    <p style="margin-bottom: 15px; font-size: 16px; color: #666;">
+                        ${
+                          errorData.message ||
+                          "Instagram Stories cannot be downloaded due to platform restrictions."
+                        }
+                    </p>
+                    
+                    ${
+                      errorData.details && errorData.details.reasons
+                        ? `
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ffc107;">
+                        <h4 style="color: #856404; margin-bottom: 10px;">
+                            <i class="fas fa-info-circle"></i> Why Stories Don't Work:
+                        </h4>
+                        <ul style="text-align: left; margin: 0; padding-left: 20px; color: #856404;">
+                            ${errorData.details.reasons
+                              .map((reason) => `<li>${reason}</li>`)
+                              .join("")}
+                        </ul>
+                    </div>
+                    `
+                        : ""
+                    }
+                    
+                    ${
+                      errorData.details && errorData.details.alternatives
+                        ? `
+                    <div style="background: #d1edff; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #007bff;">
+                        <h4 style="color: #004085; margin-bottom: 10px;">
+                            <i class="fas fa-lightbulb"></i> Try These Instead:
+                        </h4>
+                        <ul style="text-align: left; margin: 0; padding-left: 20px; color: #004085;">
+                            ${errorData.details.alternatives
+                              .map((alt) => `<li><strong>${alt}</strong></li>`)
+                              .join("")}
+                        </ul>
+                    </div>
+                    `
+                        : ""
+                    }
+                    
+                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745;">
+                        <p style="margin: 0; color: #155724; font-weight: bold;">
+                            <i class="fas fa-arrow-up"></i>
+                             ${
+                               errorData.recommendation ||
+                               "Paste a Reel or Post URL above for better results!"
+                             }
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+          errorMessage.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e74c3c; margin-bottom: 15px;"></i>
+                    <h3 style="color: #e74c3c; margin-bottom: 15px;">Error</h3>
+                    <p style="color: #666; font-size: 16px;">${message}</p>
+                </div>
+            `;
+        }
+        showSection(errorSection);
+        clearStatusCheck();
+      }
+
+      // Clear status check interval
+      function clearStatusCheck() {
+        if (statusCheckInterval) {
+          clearInterval(statusCheckInterval);
+          statusCheckInterval = null;
+        }
+      }
+
+      // Format functions
+      function formatFileSize(bytes) {
+        if (bytes === 0 || !bytes) return "Unknown size";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
+          " " +
+          sizes[i]
+        );
+      }
+
+      function formatDuration(seconds) {
+        if (!seconds) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      function formatNumber(num) {
+        if (!num) return "0";
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+        return num.toString();
+      }
+
+      // Update job status badge
+      function updateJobStatus(status) {
+        const statusConfig = {
+          queued: { icon: "fa-clock", text: "Queued", class: "queued" },
+          downloading: {
+            icon: "fa-download",
+            text: "Downloading",
+            class: "downloading",
+          },
+          completed: {
+            icon: "fa-check",
+            text: "Completed",
+            class: "completed",
+          },
+          failed: { icon: "fa-times", text: "Failed", class: "failed" },
+        };
+
+        const config = statusConfig[status] || statusConfig.queued;
+        if (jobStatus) {
+          jobStatus.className = `job-status ${config.class}`;
+          jobStatus.innerHTML = `<i class="fas ${config.icon}"></i><span>${config.text}</span>`;
+        }
+      }
+
+      // ✅ MAIN EXTRACT FUNCTION - FIXED TO NOT SHOW ERROR ON EMPTY INPUT
+      async function extractVideoInfo() {
+        const url = videoUrlInput.value.trim();
+
+        // ✅ FIXED: Just return without showing error when input is empty
+        if (!url) {
+          return;
+        }
+
+        const validation = validateInstagramURL(url);
+        if (!validation.valid) {
+          showError(validation.error);
+          return;
+        }
+
+        const normalizedData = validation.data;
+        const contentTypeMessages = {
+          story: "Checking Instagram Story...",
+          reel: "Extracting Instagram Reel...",
+          post: "Extracting Instagram Post...",
+          igtv: "Extracting IGTV Video...",
+        };
+
+        showSection(loadingSection);
+        animateExtractProgress(
+          contentTypeMessages[normalizedData.type] ||
+            "Extracting Instagram Content..."
+        );
+
+        extractBtn.disabled = true;
+
+        try {
+          const response = await fetch("/extract", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: normalizedData.url,
+              content_type: normalizedData.type,
+              original_url: url,
+            }),
+          });
+
+          // ✅ ALWAYS EXPECT 200 OK - Check success in JSON
+          const data = await response.json();
+
+          if (data.success) {
+            currentSessionId = data.session_id;
+            displayVideoInfo(data.video_info, normalizedData.type);
+          } else {
+            // Handle different error types
+            if (data.error_type === "story_not_supported") {
+              showError(data.error, true, data);
+            } else {
+              showError(data.error || "Failed to extract video information");
+            }
+          }
+        } catch (error) {
+          console.error("Network error:", error);
+          showError(
+            "Network error. Please check your connection and try again."
+          );
+        } finally {
+          extractBtn.disabled = false;
+        }
+      }
+
+      // Display video info
+      function displayVideoInfo(videoInfo, contentType = "reel") {
+        const thumbnailContainer = document.getElementById(
+          "videoThumbnailContainer"
+        );
+        if (thumbnailContainer) {
+          thumbnailContainer.innerHTML = `
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-size='14' text-anchor='middle' dy='.3em' fill='%23999'%3EInstagram Content%3C/text%3E%3C/svg%3E"
+                     alt="Video Thumbnail" style="width: 100%; height: 200px; object-fit: cover;" />
+                <div class="play-overlay">
+                    <i class="fab fa-instagram"></i>
+                </div>
+            `;
+        }
+
+        const contentTitles = {
+          story: "Instagram Story",
+          reel: "Instagram Reel",
+          post: "Instagram Post",
+          igtv: "IGTV Video",
+        };
+
+        const titleElement = document.getElementById("videoTitle");
+        const uploaderElement = document.getElementById("videoUploader");
+        const durationElement = document.getElementById("videoDuration");
+        const viewsElement = document.getElementById("videoViews");
+
+        if (titleElement)
+          titleElement.textContent =
+            videoInfo.title ||
+            contentTitles[contentType] ||
+            "Instagram Content";
+        if (uploaderElement)
+          uploaderElement.innerHTML = `<i class="fas fa-user"></i> ${
+            videoInfo.uploader || "Unknown"
+          }`;
+        if (durationElement)
+          durationElement.innerHTML = `<i class="fas fa-clock"></i> ${formatDuration(
+            videoInfo.duration
+          )}`;
+        if (viewsElement)
+          viewsElement.innerHTML = `<i class="fas fa-eye"></i> ${formatNumber(
+            videoInfo.view_count || 0
+          )} views`;
+
+        // Populate format list
+        if (formatList) {
+          formatList.innerHTML = "";
+          if (!videoInfo.formats || videoInfo.formats.length === 0) {
+            formatList.innerHTML =
+              '<p style="color: #666; text-align: center; padding: 20px;">No formats available.</p>';
+            return;
+          }
+
+          videoInfo.formats.forEach((format) => {
+            const formatItem = document.createElement("div");
+            formatItem.className = "format-item";
+
+            let qualityDisplay = format.quality || "Unknown Quality";
+            if (format.height && format.width) {
+              qualityDisplay = `${format.height}p (${format.width}x${format.height})`;
+            }
+
+            let resolutionInfo = "";
+            if (format.height && format.width) {
+              resolutionInfo = `<span class="format-resolution">${format.width}x${format.height}</span>`;
+            }
+
+            const iconClass = format.type === "audio" ? "fa-music" : "fa-video";
+
+            formatItem.innerHTML = `
+                    <div class="format-info">
+                        <span class="format-quality">${qualityDisplay}</span>
+                        <span class="format-type">${
+                          format.ext ? format.ext.toUpperCase() : "MP4"
+                        }</span>
+                        ${
+                          format.filesize
+                            ? `<span class="format-size">${formatFileSize(
+                                format.filesize
+                              )}</span>`
+                            : ""
+                        }
+                        ${resolutionInfo}
+                    </div>
+                    <div class="format-icon">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                `;
+
+            formatItem.addEventListener("click", () =>
+              selectFormat(format, formatItem)
+            );
+            formatList.appendChild(formatItem);
+          });
+        }
+
+        showSection(videoInfoSection);
+      }
+
+      // Select format
+      function selectFormat(format, element) {
+        document.querySelectorAll(".format-item").forEach((item) => {
+          item.classList.remove("selected");
+        });
+        element.classList.add("selected");
+        selectedFormat = format;
+
+        if (downloadBtn) {
+          downloadBtn.classList.remove("disabled");
+          const qualityText = format.height
+            ? `${format.height}p`
+            : format.quality;
+          const extText = format.ext ? format.ext.toUpperCase() : "MP4";
+          downloadBtn.innerHTML = `
+                <i class="fas fa-download"></i>
+                <span>Download ${qualityText} (${extText})</span>
+            `;
+        }
+      }
+
+      // Download video
+      async function downloadVideo() {
+        if (!selectedFormat || !currentSessionId) {
+          showError("Please select a format first");
+          return;
+        }
+
+        showSection(downloadSection);
+        updateJobStatus("queued");
+
+        try {
+          const response = await fetch("/download", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session_id: currentSessionId,
+              format_id: selectedFormat.format_id,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            currentJobId = data.job_id;
+            if (jobIdElement) {
+              jobIdElement.textContent = `Job ID: ${currentJobId.substring(
+                0,
+                8
+              )}...`;
+            }
+            startStatusCheck();
+          } else {
+            if (data.error_type === "story_download_blocked") {
+              showError("Stories cannot be downloaded", true, {
+                message: data.error,
+                recommendation:
+                  "Please try using Instagram Reels or Posts instead!",
+              });
+            } else {
+              showError(data.error || "Failed to start download");
+            }
+          }
+        } catch (error) {
+          console.error("Download error:", error);
+          showError("Network error during download. Please try again.");
+        }
+      }
+
+      // Start status checking
+      function startStatusCheck() {
+        if (!currentJobId) return;
+
+        statusCheckInterval = setInterval(async () => {
+          try {
+            const response = await fetch(`/status/${currentJobId}`);
+            const data = await response.json();
+
+            if (data.success) {
+              updateDownloadProgress(data);
+              if (data.status === "completed") {
+                clearStatusCheck();
+                showDownloadComplete(data);
+              } else if (data.status === "failed") {
+                clearStatusCheck();
+                showError(data.error || "Download failed");
+              }
+            } else {
+              clearStatusCheck();
+              showError("Failed to check download status");
+            }
+          } catch (error) {
+            console.error("Status check error:", error);
+            clearStatusCheck();
+            showError("Network error while checking status");
+          }
+        }, 1000);
+      }
+
+      // Update download progress
+      function updateDownloadProgress(jobData) {
+        const { status, progress = 0, video_title } = jobData;
+
+        updateJobStatus(status);
+        const progressPercent = Math.floor(progress);
+
+        // Update circular progress
+        const progressCircle = document.getElementById(
+          "downloadProgressCircle"
+        );
+        const circularProgress = document.getElementById(
+          "downloadCircularProgress"
+        );
+        if (progressCircle && circularProgress) {
+          const circumference = 2 * Math.PI * 50;
+          const offset = circumference - (progress / 100) * circumference;
+          progressCircle.style.strokeDashoffset = offset;
+          circularProgress.textContent = progressPercent + "%";
+        }
+
+        // Update progress bar
+        const progressFill = document.getElementById("downloadProgressFill");
+        const progressPercentage = document.getElementById(
+          "downloadProgressPercentage"
+        );
+        if (progressFill) progressFill.style.width = progress + "%";
+        if (progressPercentage)
+          progressPercentage.textContent = progressPercent + "%";
+
+        // Update text
+        const statusTexts = {
+          queued: "Queued for download",
+          downloading: "Downloading Instagram content",
+          completed: "Download complete",
+        };
+
+        const statusDetails = {
+          queued: "Your download is in the queue...",
+          downloading: "Your Instagram content is being downloaded...",
+          completed: "Your content has been downloaded successfully!",
+        };
+
+        const downloadText = document.getElementById("downloadText");
+        const downloadDetails = document.getElementById("downloadDetails");
+        const progressLabel = document.getElementById("downloadProgressLabel");
+
+        if (downloadText)
+          downloadText.textContent = statusTexts[status] || "Processing";
+        if (downloadDetails)
+          downloadDetails.textContent =
+            statusDetails[status] || "Processing your request...";
+        if (progressLabel)
+          progressLabel.textContent =
+            status.charAt(0).toUpperCase() + status.slice(1) + "...";
+
+        if (video_title && videoTitle2) {
+          videoTitle2.textContent = `Content: ${video_title.substring(
+            0,
+            30
+          )}...`;
+        }
+      }
+
+      // Show download complete
+      function showDownloadComplete(jobData) {
+        if (jobData.download_url && downloadLink) {
+          downloadLink.href = jobData.download_url;
+          downloadLink.download = jobData.filename || "instagram_content";
+        }
+        showSection(downloadCompleteSection);
+      }
+
+      // Reset form
+      function resetForm() {
+        videoUrlInput.value = "";
+        currentSessionId = null;
+        selectedFormat = null;
+        currentJobId = null;
+        clearStatusCheck();
+
+        if (downloadBtn) {
+          downloadBtn.classList.add("disabled");
+          downloadBtn.innerHTML = `
+                <i class="fas fa-download"></i>
+                <span>Select a format to download</span>
+            `;
+        }
+
+        const sections = [
+          loadingSection,
+          videoInfoSection,
+          downloadSection,
+          downloadCompleteSection,
+          errorSection,
+        ];
+        sections.forEach((s) => s.classList.add("hidden"));
+      }
+
+      // Auto-focus
+      if (videoUrlInput) videoUrlInput.focus();
+
+      // Progress animation
+      function animateExtractProgress(
+        customMessage = "Extracting Instagram content..."
+      ) {
+        const circularProgress = document.getElementById("circularProgress");
+        const progressCircle = document.getElementById("progressCircle");
+        const progressFill = document.getElementById("progressFill");
+        const progressPercentage =
+          document.getElementById("progressPercentage");
+        const progressLabel = document.getElementById("progressLabel");
+        const loadingDetails = document.getElementById("loadingDetails");
+
+        if (!progressCircle || !circularProgress) return;
+
+        let progress = 0;
+        const duration = 2000;
+        const startTime = Date.now();
+
+        const stages = [
+          {
+            progress: 20,
+            label: "Connecting to Instagram...",
+            details: "Establishing secure connection",
+          },
+          {
+            progress: 50,
+            label: customMessage,
+            details: "Retrieving content information",
+          },
+          {
+            progress: 80,
+            label: "Processing formats...",
+            details: "Analyzing available qualities",
+          },
+          {
+            progress: 100,
+            label: "Complete!",
+            details: "Content information extracted successfully",
+          },
+        ];
+
+        let currentStage = 0;
+
+        const interval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          progress = Math.min((elapsed / duration) * 100, 100);
+
+          while (
+            currentStage < stages.length - 1 &&
+            progress >= stages[currentStage + 1].progress
+          ) {
+            currentStage++;
+            if (progressLabel)
+              progressLabel.textContent = stages[currentStage].label;
+            if (loadingDetails)
+              loadingDetails.textContent = stages[currentStage].details;
+          }
+
+          const circumference = 2 * Math.PI * 50;
+          const offset = circumference - (progress / 100) * circumference;
+          progressCircle.style.strokeDashoffset = offset;
+          circularProgress.textContent = Math.floor(progress) + "%";
+
+          if (progressFill) progressFill.style.width = progress + "%";
+          if (progressPercentage)
+            progressPercentage.textContent = Math.floor(progress) + "%";
+
+          if (progress >= 100) {
+            clearInterval(interval);
+          }
+        }, 50);
+      }
+    </script>
+
+    <script>
+      function initAccordion(scope) {
+        const items = scope.querySelectorAll(".accordion-item");
+
+        items.forEach((item) => {
+          const header = item.querySelector(".accordion-header");
+          const content = item.querySelector(".accordion-content");
+          const inner = item.querySelector(".accordion-inner");
+          const arrow = item.querySelector(".accordion-arrow");
+
+          header.addEventListener("click", () => {
+            const isOpen =
+              content.style.height && content.style.height !== "0px";
+
+            items.forEach((i) => {
+              i.querySelector(".accordion-content").style.height = 0;
+              i.querySelector(".accordion-arrow").classList.remove("rotate");
+            });
+
+            if (!isOpen) {
+              content.style.height = inner.scrollHeight + "px";
+              arrow.classList.add("rotate");
+            }
+          });
+        });
+
+        window.addEventListener("resize", () => {
+          items.forEach((item) => {
+            const content = item.querySelector(".accordion-content");
+            const inner = item.querySelector(".accordion-inner");
+            const isOpen =
+              content.style.height && content.style.height !== "0px";
+            if (isOpen) {
+              content.style.height = inner.scrollHeight + "px";
+            }
+          });
+        });
+      }
+
+      document
+        .querySelectorAll(".accordion")
+        .forEach((acc) => initAccordion(acc));
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const headerMenu = document.querySelector(".header__menu");
+        const headerLinks = document.querySelector(".header__links");
+        const headerClose = document.querySelector(".header__close");
+
+        headerMenu.addEventListener("click", function () {
+          headerLinks.classList.toggle("header__hidden");
+        });
+
+        headerClose.addEventListener("click", function () {
+          headerLinks.classList.toggle("header__hidden");
+        });
+        // Close the menu when clicking outside of it
+        document.addEventListener("click", function (event) {
+          if (
+            !headerMenu.contains(event.target) &&
+            !headerLinks.contains(event.target)
+          ) {
+            headerLinks.classList.add("header__hidden");
+          }
+        });
+        // Close the menu when clicking on a link
+        const links = headerLinks.querySelectorAll("a");
+        links.forEach(function (link) {
+          link.addEventListener("click", function () {
+            headerLinks.classList.add("header__hidden");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
